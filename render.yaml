@@ -1,0 +1,37 @@
+# Blueprint Render : Dashboard > New > Blueprint > choisir ce dépôt.
+services:
+  - type: web
+    name: studio-reco-medias
+    runtime: node
+    region: frankfurt
+    plan: free            # passer en « starter » pour éviter la mise en veille après 15 min d’inactivité
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ANTHROPIC_API_KEY      # clé API Anthropic (console.anthropic.com)
+        sync: false
+      - key: ADMIN_PASSWORD         # mot de passe de la page /admin
+        sync: false
+      - key: SITE_PASSWORD          # facultatif : mot de passe d’accès au studio (laisser vide = lien public)
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CLAUDE_MODEL
+        value: claude-sonnet-5
+      - key: CLAUDE_MODEL_QUICK
+        value: claude-haiku-4-5
+      - key: SAMPLE_RATE_LIMIT
+        value: "60"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: studio-reco-db
+          property: connectionString
+
+databases:
+  - name: studio-reco-db
+    region: frankfurt
+    plan: basic-256mb       # offre payante d’entrée de gamme ; la base gratuite est supprimée au bout de 30 jours
